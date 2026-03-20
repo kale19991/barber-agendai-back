@@ -3,10 +3,7 @@
 # Ambiente completo com API + SQL Server
 # ===================================
 
-version: '3.8'
-
 services:
-
   # ===================================
   # SQL SERVER
   # ===================================
@@ -27,7 +24,11 @@ services:
     networks:
       - barbearia-network
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P BarbeariaSaaS@2024! -Q 'SELECT 1' || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P BarbeariaSaaS@2024! -Q 'SELECT 1' -C || exit 1",
+        ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -52,24 +53,23 @@ services:
       # Configurações de ambiente
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8080
-      
+
       # Connection String
       - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=BarbeariaSaaS;User Id=sa;Password=BarbeariaSaaS@2024!;TrustServerCertificate=true;MultipleActiveResultSets=true
-      
+
       # JWT Settings
       - JwtSettings__SecretKey=BarbeariaSaaS-Super-Secret-Key-256-Bits-For-JWT-Token-Security-Production-2024
       - JwtSettings__Issuer=BarbeariaSaaS-Production
       - JwtSettings__Audience=BarbeariaSaaS-Users-Production
       - JwtSettings__ExpirationHours=24
-      
+
       # Logging
       - Logging__LogLevel__Default=Information
       - Logging__LogLevel__Microsoft=Warning
       - Logging__LogLevel__Microsoft.Hosting.Lifetime=Information
-      
+
     ports:
       - "8080:8080"
-      - "8081:8081"
     volumes:
       - app_logs:/app/logs
       - app_uploads:/app/uploads
@@ -110,15 +110,15 @@ volumes:
   sqlserver_data:
     driver: local
     name: barbearia-saas-sqlserver-data
-    
+
   app_logs:
     driver: local
     name: barbearia-saas-logs
-    
+
   app_uploads:
     driver: local
     name: barbearia-saas-uploads
-    
+
   redis_data:
     driver: local
     name: barbearia-saas-redis-data
@@ -129,4 +129,4 @@ volumes:
 networks:
   barbearia-network:
     driver: bridge
-    name: barbearia-saas-network 
+    name: barbearia-saas-network
